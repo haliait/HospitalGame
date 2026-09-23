@@ -5,6 +5,7 @@ import { AppService } from './app.service.js';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { GraphQlResolver } from './resolver.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -28,6 +29,6 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GraphQlResolver],
 })
 export class AppModule {}

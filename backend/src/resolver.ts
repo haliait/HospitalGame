@@ -44,6 +44,8 @@ export class GraphQlResolver {
         // Mise à jour de l'argent du monde
         world.money -= coutTotal;
 
+        this.service.checkUnlocks(world);
+
         this.service.saveWorld(user, world);
         return product;
     }
@@ -90,6 +92,75 @@ export class GraphQlResolver {
 
         this.service.saveWorld(user, world);
         return manager;
+    }
+
+    @Mutation()
+    async acheterCashUpgrade(
+       @Args('user') user: string,
+       @Args('name') name: string,
+    ) {
+        let world = this.service.readUserWorld(user);
+        world = this.service.updateWorld(world);
+
+        const palier = world.upgrades.find((u) => u.name === name);
+        if (!palier) {
+            throw new Error(`L'upgrade ${name} n'existe pas`);
+        }
+        if (palier.unlocked) {
+            throw new Error(`L'upgrade ${name} a déjà été acheté`);
+        }
+        if (world.money < palier.seuil) {
+            throw new Error(`Argent insuffisant pour acheter ${name}`);
+        }
+
+        world.money -= palier.seuil;
+        this.service.applyPalierBonus(world, palier);
+
+        this.service.saveWorld(user, world);
+        return palier;
+    }
+
+    @Mutation()
+    async acheterAngelUpgrade(
+        @Args('user') user: string,
+        @Args('name') name: string,
+    ) {
+        let world = this.service.readUserWorld(user);
+        world = this.service.updateWorld(world);
+
+        const palier = world.angelupgrades.find((u) => u.name === name);
+        if (!palier) {
+            throw new Error(`L'angel upgrade ${name} n'existe pas`);
+        }
+        if (palier.unlocked) {
+            throw new Error(`L'angel upgrade ${name} a déjà été acheté`);
+        }
+        if (world.activeangels < palier.seuil) {
+            throw new Error(`Anges insuffisants pour acheter ${name}`);
+        }
+
+        world.activeangels -= palier.seuil;
+        this.service.applyPalierBonus(world, palier);
+
+        this.service.saveWorld(user, world);
+        return palier;
+    }
+
+
+    @Mutation()
+    async resetWorld(@Args('user') user: string) {
+        let world = this.service.readUserWorld(user);
+        world = this.service.updateWorld(world);
+
+        const angesGagnes = Math.floor(150 * Math.sqrt(world.score / 1e15) - world.totalangels);
+
+        const nouveauMonde = JSON.parse(JSON.stringify(origworld));
+        nouveauMonde.score = world.score;
+        nouveauMonde.totalangels = world.totalangels + Math.max(0, angesGagnes);
+        nouveauMonde.activeangels = world.activeangels + Math.max(0, angesGagnes);
+
+        this.service.saveWorld(user, nouveauMonde);
+        return nouveauMonde;
     }
     
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
-import { World } from './graphql.js';
+import { World, Palier, RatioType } from './graphql.js';
 import { origworld } from './origworld.js';
 
 @Injectable()
@@ -83,5 +83,52 @@ export class AppService {
 
     world.lastupdate = now;
     return world;
+  }
+
+  applyPalierBonus(world: World, palier: Palier) {
+    if (palier.typeratio === RatioType.gain) {
+      if (palier.idcible === 0) {
+        for (const p of world.products) {
+          p.revenu *= palier.ratio;
+        }
+      } else {
+        const product = world.products.find((p) => p.id === palier.idcible);
+        if (product) product.revenu *= palier.ratio;
+      }
+    } else if (palier.typeratio === RatioType.vitesse) {
+      if (palier.idcible === 0) {
+        for (const p of world.products) {
+          p.vitesse /= palier.ratio;
+        }
+      } else {
+        const product = world.products.find((p) => p.id === palier.idcible);
+        if (product) product.vitesse /= palier.ratio;
+      }
+    } else if (palier.typeratio === RatioType.ange) {
+      world.angelbonus += palier.ratio;
+    }
+
+    palier.unlocked = true;
+  }
+
+  checkUnlocks(world: World) {
+    for (const product of world.products) {
+      for (const palier of product.paliers) {
+        if (!palier.unlocked && product.quantite >= palier.seuil) {
+          this.applyPalierBonus(world, palier);
+        }
+      }
+    }
+
+    for (const palier of world.allunlocks) {
+      if (!palier.unlocked) {
+        const tousAuSeuil = world.products.every(
+          (p) => p.quantite >= palier.seuil,
+        );
+        if (tousAuSeuil) {
+          this.applyPalierBonus(world, palier);
+        }
+      }
+    }
   }
 }

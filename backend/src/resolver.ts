@@ -39,6 +39,9 @@ export class GraphQlResolver {
 
         // Mise à jour du produit
         product.quantite += quantite;
+        if (world.money < coutTotal) {
+            throw new Error('Argent insuffisant');
+        }
         product.cout = coutCourant; // nouveau prix pour le prochain achat
 
         // Mise à jour de l'argent du monde
@@ -89,6 +92,11 @@ export class GraphQlResolver {
 
         manager.unlocked = true;
         product.managerUnlocked = true;
+
+        if (world.money < manager.seuil) {
+          throw new Error(`Argent insuffisant pour engager ${name}`);
+        }
+        world.money -= manager.seuil;
 
         this.service.saveWorld(user, world);
         return manager;

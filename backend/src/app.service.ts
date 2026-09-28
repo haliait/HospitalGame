@@ -6,6 +6,9 @@ import { origworld } from './origworld.js';
 
 @Injectable()
 export class AppService {
+  constructor() {
+    fs.mkdirSync(path.join(process.cwd(), 'userworlds'), { recursive: true });
+  }
   getHello(): string {
     return 'Hello World!';
   }
@@ -18,7 +21,7 @@ export class AppService {
       return JSON.parse(data.toString());
     } catch (e: unknown) {
       console.log((e as Error).message);
-      return origworld;
+      return JSON.parse(JSON.stringify(origworld));
     }
   }
 
@@ -36,15 +39,17 @@ export class AppService {
   }
 
   updateWorld(world: World) {
-    const now = Date.now();
-    const elapsed = now - world.lastupdate;
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    const elapsed = (nowSeconds - world.lastupdate) * 1000;
+
+    const bonusAnges = 1 + (world.activeangels * world.angelbonus) / 100;
 
     for (const product of world.products) {
       if (!product.managerUnlocked) {
         // CAS 1 : pas de manager
         if (product.timeleft > 0 && product.timeleft <= elapsed) {
           // la production s'est terminée pendant ce laps de temps
-          const gain = product.revenu * product.quantite;
+          const gain = product.revenu * product.quantite* bonusAnges;
           world.money += gain;
           world.score += gain;
           product.timeleft = 0;
@@ -74,14 +79,14 @@ export class AppService {
         }
 
         if (nombreDeProductions > 0) {
-          const gain = product.revenu * product.quantite * nombreDeProductions;
+          const gain = product.revenu * product.quantite * nombreDeProductions* bonusAnges;
           world.money += gain;
           world.score += gain;
         }
       }
     }
 
-    world.lastupdate = now;
+    world.lastupdate = nowSeconds;
     return world;
   }
 

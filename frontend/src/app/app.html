@@ -1,0 +1,10 @@
+@if (gameService.worldQuery.loading()) {
+  <p>Chargement...</p>
+}
+@if (gameService.worldQuery.error(); as error) {
+  <p>Erreur : {{ error.message }}</p>
+}
+<h1>{{ world()?.name }}</h1>
+<p>Joueur : {{ gameService.user() }}</p>
+<p>Argent : {{ world()?.money }}</p>
+<img [src]="gameService.server() + world()?.logo" width="100" />

@@ -1,0 +1,97 @@
+# ============================================================
+#  HospitalGame - Toutes les opérations GraphQL du frontend
+#  A placer dans frontend/src/app/queries.graphql
+#  puis lancer : npm run codegen
+# ============================================================
+
+fragment PalierFields on Palier {
+  name
+  logo
+  seuil
+  idcible
+  ratio
+  typeratio
+  unlocked
+}
+
+# ---------- QUERY ----------
+
+query getWorld($user: String!) {
+  getWorld(user: $user) {
+    name
+    logo
+    money
+    score
+    totalangels
+    activeangels
+    angelbonus
+    lastupdate
+    products {
+      id
+      name
+      logo
+      cout
+      croissance
+      revenu
+      vitesse
+      quantite
+      timeleft
+      managerUnlocked
+      paliers {
+        ...PalierFields
+      }
+    }
+    allunlocks {
+      ...PalierFields
+    }
+    upgrades {
+      ...PalierFields
+    }
+    angelupgrades {
+      ...PalierFields
+    }
+    managers {
+      ...PalierFields
+    }
+  }
+}
+
+# ---------- MUTATIONS : MOTEUR (Personne A) ----------
+
+mutation acheterQtProduit($user: String!, $id: Int!, $quantite: Int!) {
+  acheterQtProduit(user: $user, id: $id, quantite: $quantite) {
+    id
+  }
+}
+
+mutation lancerProductionProduit($user: String!, $id: Int!) {
+  lancerProductionProduit(user: $user, id: $id) {
+    id
+  }
+}
+
+# ---------- MUTATIONS : MENUS (Personne B) ----------
+
+mutation engagerManager($user: String!, $name: String!) {
+  engagerManager(user: $user, name: $name) {
+    name
+  }
+}
+
+mutation acheterCashUpgrade($user: String!, $name: String!) {
+  acheterCashUpgrade(user: $user, name: $name) {
+    name
+  }
+}
+
+mutation acheterAngelUpgrade($user: String!, $name: String!) {
+  acheterAngelUpgrade(user: $user, name: $name) {
+    name
+  }
+}
+
+mutation resetWorld($user: String!) {
+  resetWorld(user: $user) {
+    name
+  }
+}

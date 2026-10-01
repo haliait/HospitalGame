@@ -1,1 +1,31 @@
-<p>produit works!</p>
+@if (prod(); as p) {
+  <div class="produit">
+
+    <!-- Partie gauche : image + quantité superposée (clic = lancer la production) -->
+    <div class="gauche" (click)="startFabrication()">
+      <img class="round" [src]="gameService.server() + p.logo" [alt]="p.name" />
+      <div class="quantite">{{ p.quantite }}</div>
+    </div>
+
+    <!-- Partie droite -->
+    <div class="droite">
+      <div class="nom">{{ p.name }}</div>
+
+      <!-- Haut : barre de progression + gain d'une production -->
+      <div class="progressbar">
+        <div class="fill" [style.width.%]="progress()"></div>
+        <span class="gain">{{ p.revenu * p.quantite | number: '1.2-2' }} $</span>
+      </div>
+
+      <!-- Bas : bouton d'achat + temps restant -->
+      <div class="bas">
+        <button class="acheter" (click)="acheter()">
+          <span class="multi">Buy {{ qtmulti() }}</span>
+          <span class="cout">{{ p.cout | number: '1.2-2' }} $</span>
+        </button>
+        <div class="temps">{{ timeleft() | seconds }}</div>
+      </div>
+    </div>
+
+  </div>
+}

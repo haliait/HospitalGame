@@ -52,11 +52,12 @@ export class GameService {
     let username = localStorage.getItem('username');
     if (!username) {
       username = 'Captain' + Math.floor(Math.random() * 10000);
+      // On mémorise le pseudo généré, sinon un nouveau joueur est créé à chaque rechargement
+      localStorage.setItem('username', username);
     }
     this.loginForm.name().value.set(username);
     this.user.set(username);
   }
-
   commitName() {
     const field = this.loginForm.name().value();
     localStorage.setItem('username', field);
@@ -137,7 +138,11 @@ export class GameService {
 
   /** Appelée par Produit à chaque fin de production (qt = nb de productions) */
   productionDone(prod: Product, qt: number) {
-    // TODO (A) : gain = revenu * quantite * qt * bonusAnges, puis mise à jour money et score
+    const gain = prod.revenu * prod.quantite * qt * this.bonusAnges();
+    // Le monde est en lecture seule : on crée une copie avec money et score mis à jour
+    this.world.update((w) =>
+      w ? { ...w, money: w.money + gain, score: w.score + gain } : w,
+    );
   }
 
   /** Coût total pour acheter qt exemplaires du produit */

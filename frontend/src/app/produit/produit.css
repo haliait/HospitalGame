@@ -1,0 +1,102 @@
+/* Conteneur : image à gauche, infos à droite */
+.produit {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+}
+
+/* ---------- Partie gauche : image + quantité superposée ---------- */
+.gauche {
+  position: relative;      /* référence pour la superposition */
+  width: 100px;
+  cursor: pointer;
+}
+
+.round {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #e3f2fd; /* fond visible même si l'image est cassée */
+}
+
+.quantite {
+  position: absolute;      /* se superpose à l'image */
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 60px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: #1a1a1a;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* ---------- Partie droite ---------- */
+.nom {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.progressbar {
+  position: relative;
+  height: 32px;
+  width: 100%;
+  background-color: #eeeeee;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  background-color: #4caf50;
+  transition: width 0s linear;
+}
+
+.gain {
+  position: absolute;      /* texte par-dessus la barre */
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.bas {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.acheter {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #ff9800;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.acheter:disabled {
+  background-color: #bdbdbd;
+  cursor: not-allowed;
+}
+
+.temps {
+  min-width: 90px;
+  padding: 6px;
+  border-radius: 6px;
+  background-color: #757575;
+  color: white;
+  text-align: center;
+  font-family: monospace;
+}

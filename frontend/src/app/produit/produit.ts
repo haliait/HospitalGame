@@ -102,6 +102,48 @@ export class Produit implements OnInit, OnDestroy {
     }
   }
 
-  /** Clic sur le bouton d'achat (étape 4) */
-  acheter() {}
+  // ---------- ACHAT ----------
+
+  /** Quantité maximale achetable avec l'argent actuel */
+  maxCanBuy = computed(() => {
+    const p = this.prod();
+    const money = this.gameService.world()?.money ?? 0;
+    if (!p || money < p.cout) return 0;
+    // Estimation par la formule de la somme géométrique
+    let n = Math.floor(
+      Math.log(1 + (money * (p.croissance - 1)) / p.cout) / Math.log(p.croissance),
+    );
+    // Correction des arrondis : on vérifie avec le vrai calcul
+    while (n > 0 && this.gameService.coutAchat(p, n) > money) n--;
+    return n;
+  });
+
+  /** Nombre d'exemplaires à acheter selon le commutateur x1 / x10 / x100 / Max */
+  numberToBuy = computed(() => {
+    switch (this.qtmulti()) {
+      case 'x10': return 10;
+      case 'x100': return 100;
+      case 'Max': return this.maxCanBuy();
+      default: return 1;
+    }
+  });
+
+  /** Coût total de l'achat affiché sur le bouton */
+  coutTotal = computed(() => {
+    const p = this.prod();
+    return p ? this.gameService.coutAchat(p, this.numberToBuy()) : 0;
+  });
+
+  /** Vrai si le joueur peut payer la quantité demandée */
+  canBuy = computed(() => {
+    const money = this.gameService.world()?.money ?? 0;
+    return this.numberToBuy() > 0 && this.coutTotal() <= money;
+  });
+
+  /** Clic sur le bouton d'achat */
+  acheter() {
+    const p = this.prod();
+    if (!p || !this.canBuy()) return;
+    this.gameService.buyProduct(this.numberToBuy(), p);
+  }
 }

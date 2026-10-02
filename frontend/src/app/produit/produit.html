@@ -19,9 +19,9 @@
 
       <!-- Bas : bouton d'achat + temps restant -->
       <div class="bas">
-        <button class="acheter" (click)="acheter()">
-          <span class="multi">Buy {{ qtmulti() }}</span>
-          <span class="cout">{{ p.cout | number: '1.2-2' }} $</span>
+        <button class="acheter" (click)="acheter()" [disabled]="!canBuy()">
+          <span class="multi">Buy x{{ numberToBuy() }}</span>
+          <span class="cout">{{ coutTotal() | number: '1.2-2' }} $</span>
         </button>
         <div class="temps">{{ timeleft() | seconds }}</div>
       </div>

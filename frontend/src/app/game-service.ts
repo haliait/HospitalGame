@@ -146,15 +146,37 @@ export class GameService {
   }
 
   /** Coût total pour acheter qt exemplaires du produit */
-  coutAchat(prod: Product, qt: number): number {
-    // TODO (A) : somme géométrique cout * (1 - croissance^qt) / (1 - croissance)
-    return 0;
+    coutAchat(prod: Product, qt: number): number {
+    // Même calcul que le backend : somme des prix successifs
+    let total = 0;
+    let prix = prod.cout;
+    for (let i = 0; i < qt; i++) {
+      total += prix;
+      prix *= prod.croissance;
+    }
+    return total;
   }
 
   /** Achat de qt exemplaires : met à jour le monde puis prévient le backend */
   buyProduct(qt: number, product: Product) {
-    // TODO (A) : quantite += qt, nouveau cout, money -= coutAchat, checkUnlocks,
-    //            puis this.acheterProduitsGraphQL(product.id, qt)
+    const w = this.world();
+    if (!w || qt <= 0) return;
+
+    const cost = this.coutAchat(product, qt);
+    if (w.money < cost) return; // pas assez d'argent
+
+    // Nouvelle liste de produits : seul le produit acheté change
+    const products = w.products.map((p) =>
+      p.id !== product.id
+        ? p
+        : { ...p, quantite: p.quantite + qt, cout: p.cout * Math.pow(p.croissance, qt) },
+    );
+
+    // Nouveau monde : produits mis à jour + argent diminué
+    this.world.set({ ...w, products, money: w.money - cost });
+
+    this.checkUnlocks(product); // rempli à l'étape 5
+    this.acheterProduitsGraphQL(product.id, qt); // prévenir le backend
   }
 
   /**

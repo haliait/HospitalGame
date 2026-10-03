@@ -25,7 +25,7 @@ export class Produit implements OnInit, OnDestroy {
     const p = this.prod();
     const t = this.timeleft();
     if (!p || t <= 0) return 0;
-    return ((p.vitesse - t) / p.vitesse) * 100;
+    return Math.min(100, Math.max(0, ((p.vitesse - t) / p.vitesse) * 100));
   });
 
   private lastupdate = performance.now();

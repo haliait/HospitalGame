@@ -14,7 +14,7 @@
       <!-- Haut : barre de progression + gain d'une production -->
       <div class="progressbar">
         <div class="fill" [style.width.%]="progress()"></div>
-        <span class="gain">{{ p.revenu * p.quantite | number: '1.2-2' }} $</span>
+        <span class="gain">{{ p.revenu * p.quantite * gameService.bonusAnges() | number: '1.2-2' }} $</span>
       </div>
 
       <!-- Bas : bouton d'achat + temps restant -->

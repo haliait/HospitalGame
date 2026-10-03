@@ -175,7 +175,7 @@ export class GameService {
     // Nouveau monde : produits mis à jour + argent diminué
     this.world.set({ ...w, products, money: w.money - cost });
 
-    this.checkUnlocks(product); // rempli à l'étape 5
+    this.checkUnlocks(); // débloque les bonus si un seuil est atteint
     this.acheterProduitsGraphQL(product.id, qt); // prévenir le backend
   }
 
@@ -184,13 +184,74 @@ export class GameService {
    * Utilisée aussi par B pour les upgrades : à écrire en priorité.
    */
   applyBonus(palier: Palier) {
-    // TODO (A) : gain -> revenu *= ratio ; vitesse -> vitesse /= ratio ;
-    //            ange -> angelbonus += ratio ; idcible 0 = tous les produits
+    // ⚠️ N'effectue PAS palier.unlocked = true : c'est à l'appelant de le faire
+    const w = this.world();
+    if (!w) return;
+
+    // Copie modifiable du monde (les données Apollo sont figées)
+    const nw = structuredClone(w);
+
+    // Produits concernés : tous si idcible = 0, sinon celui ciblé
+    const cibles =
+      palier.idcible === 0 ? nw.products : nw.products.filter((p) => p.id === palier.idcible);
+
+    if (palier.typeratio === RatioType.Gain) {
+      cibles.forEach((p) => (p.revenu *= palier.ratio));
+    } else if (palier.typeratio === RatioType.Vitesse) {
+      cibles.forEach((p) => (p.vitesse /= palier.ratio));
+    } else if (palier.typeratio === RatioType.Ange) {
+      nw.angelbonus += palier.ratio;
+    }
+
+    this.world.set(nw);
+  }
+
+  /** Texte lisible d'un bonus, ex. "Consultation : vitesse x2" (utile aussi pour les modales de B) */
+  libelleBonus(palier: Palier): string {
+    if (palier.typeratio === RatioType.Ange) return `Efficacité des anges +${palier.ratio}%`;
+    const cible =
+      palier.idcible === 0
+        ? 'Tous les services'
+        : (this.world()?.products.find((p) => p.id === palier.idcible)?.name ?? '?');
+    const type = palier.typeratio === RatioType.Gain ? 'gain' : 'vitesse';
+    return `${cible} : ${type} x${palier.ratio}`;
   }
 
   /** Vérifie et débloque les unlocks du produit + les allunlocks */
-  checkUnlocks(product: Product) {
-    // TODO (A)
+  /** Vérifie et débloque les unlocks des produits + les allunlocks (même logique que le backend) */
+  checkUnlocks() {
+    const w = this.world();
+    if (!w) return;
+
+    const nw = structuredClone(w);
+    const debloques: Palier[] = [];
+
+    // 1. Unlocks propres à chaque produit
+    for (const p of nw.products) {
+      for (const palier of p.paliers) {
+        if (!palier.unlocked && p.quantite >= palier.seuil) {
+          palier.unlocked = true;
+          debloques.push(palier);
+        }
+      }
+    }
+
+    // 2. Allunlocks : TOUS les produits doivent atteindre le seuil
+    for (const palier of nw.allunlocks) {
+      if (!palier.unlocked && nw.products.every((p) => p.quantite >= palier.seuil)) {
+        palier.unlocked = true;
+        debloques.push(palier);
+      }
+    }
+
+    if (debloques.length === 0) return;
+
+    // On enregistre les paliers débloqués, puis on applique leurs bonus
+    this.world.set(nw);
+    debloques.forEach((palier) => this.applyBonus(palier));
+
+    // Message éphémère pour le joueur
+    this.snackmessage.set('🔓 ' + debloques.map((pal) => this.libelleBonus(pal)).join(' | '));
   }
 
   // ============================================================

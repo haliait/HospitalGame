@@ -1,8 +1,52 @@
-<h1>{{ world()?.name }}</h1>
-<p>Argent : {{ world()?.money }} $</p>
+<div class="header">
+  <div class="world">
+    <img class="round" [src]="gameService.server() + world()?.logo" />
+    <span>{{ world()?.name }}</span>
+  </div>
 
-<div class="products">
-  @for (p of world()?.products; track p.id) {
-    <app-produit [prod]="p" qtmulti="x1"></app-produit>
-  }
+  <div class="money">
+    $ <span id="money" [innerHTML]="world()?.money ?? 0 | bigvalue"></span>
+  </div>
+
+  <div class="multi">
+    <button mat-raised-button color="accent" (click)="changeQtMulti()">
+      Buy {{ qtmulti() }}
+    </button>
+  </div>
+
+  <div class="login">
+    <div>Your ID :</div>
+    <input
+      type="text"
+      [formField]="gameService.loginForm.name"
+      (keydown.enter)="gameService.commitName()" />
+    <button mat-stroked-button (click)="gameService.refreshWorld()">Refresh</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="menu">
+    <button mat-raised-button color="primary" (click)="showUnlocks.set(true)">Unlocks</button>
+
+    <button mat-raised-button color="primary"
+      [matBadge]="badgeUpgrades()" [matBadgeHidden]="badgeUpgrades() == 0"
+      (click)="showUpgrades.set(true)">Cash Upgrades</button>
+
+    <button mat-raised-button color="primary"
+      [matBadge]="badgeAngelUpgrades()" [matBadgeHidden]="badgeAngelUpgrades() == 0"
+      (click)="showAngelUpgrades.set(true)">Angel Upgrades</button>
+
+    <button mat-raised-button color="primary"
+      [matBadge]="badgeManagers()" [matBadgeHidden]="badgeManagers() == 0"
+      (click)="showManagers.set(true)">Managers</button>
+
+    <button mat-raised-button color="primary" (click)="showInvestors.set(true)">Investors</button>
+  </div>
+
+  <div class="products">
+    @for (j of [0, 1, 2, 3, 4, 5]; track $index) {
+      <app-produit [prod]="world()?.products?.[j]" [qtmulti]="qtmulti()" class="product">
+      </app-produit>
+    }
+  </div>
 </div>

@@ -265,22 +265,69 @@ export class GameService {
     return Math.max(0, Math.floor(150 * Math.sqrt(w.score / 1e15) - w.totalangels));
   });
 
-  hireManager(manager: Palier) {
-    // TODO (B) : vérifier money >= seuil, retirer le coût, manager.unlocked = true,
-    //            product.managerUnlocked = true, snackmessage, engagerManagerGraphQL
+    hireManager(manager: Palier) {
+    const world = this.world();
+    if (!world || world.money < manager.seuil) return;
+
+    this.world.update((w) => {
+      if (!w) return w;
+      return {
+        ...w,
+        money: w.money - manager.seuil,
+        managers: w.managers.map((m) =>
+          m.name === manager.name ? { ...m, unlocked: true } : m,
+        ),
+        products: w.products.map((p) =>
+          p.id === manager.idcible ? { ...p, managerUnlocked: true } : p,
+        ),
+      };
+    });
+
+    this.snackmessage.set(`Manager ${manager.name} engagé !`);
+    this.engagerManagerGraphQL(manager.name);
   }
 
   buyCashUpgrade(upgrade: Palier) {
-    // TODO (B) : vérifier money, retirer le coût, applyBonus(upgrade),
-    //            snackmessage, acheterCashUpgradeGraphQL
+    const world = this.world();
+    if (!world || world.money < upgrade.seuil) return;
+
+    this.world.update((w) => {
+      if (!w) return w;
+      return {
+        ...w,
+        money: w.money - upgrade.seuil,
+        upgrades: w.upgrades.map((u) =>
+          u.name === upgrade.name ? { ...u, unlocked: true } : u,
+        ),
+      };
+    });
+
+    this.applyBonus(upgrade);
+    this.snackmessage.set(`Upgrade acheté : ${this.libelleBonus(upgrade)}`);
+    this.acheterCashUpgradeGraphQL(upgrade.name);
   }
 
   buyAngelUpgrade(upgrade: Palier) {
-    // TODO (B) : vérifier activeangels, les retirer, applyBonus(upgrade),
-    //            snackmessage, acheterAngelUpgradeGraphQL
+    const world = this.world();
+    if (!world || world.activeangels < upgrade.seuil) return;
+
+    this.world.update((w) => {
+      if (!w) return w;
+      return {
+        ...w,
+        activeangels: w.activeangels - upgrade.seuil,
+        angelupgrades: w.angelupgrades.map((u) =>
+          u.name === upgrade.name ? { ...u, unlocked: true } : u,
+        ),
+      };
+    });
+
+    this.applyBonus(upgrade); // gère gain, vitesse et ange
+    this.snackmessage.set(`Angel upgrade acheté : ${this.libelleBonus(upgrade)}`);
+    this.acheterAngelUpgradeGraphQL(upgrade.name);
   }
 
   resetWorld() {
-    // TODO (B) : this.resetWorldGraphQL()
+    this.resetWorldGraphQL();
   }
 }

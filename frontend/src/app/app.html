@@ -49,4 +49,157 @@
       </app-produit>
     }
   </div>
+
+  <!-- ===== MANAGERS ===== -->
+@if (showManagers()) {
+  <div class="modal">
+    <h1 class="title">Managers make you feel better !</h1>
+
+    @for (manager of world()?.managers; track manager.name) {
+      @if (!manager.unlocked) {
+        <div class="row">
+          <img class="round" [attr.src]="gameService.server() + manager.logo" />
+          <div class="rowtext">
+            <div>{{ manager.name }}</div>
+            <div>{{ cibleName(manager) }}</div>
+            <div class="cost" [innerHTML]="manager.seuil | bigvalue"></div>
+          </div>
+          <div
+            class="buybutton"
+            [class.selectable]="(world()?.money ?? 0) >= manager.seuil"
+            (click)="gameService.hireManager(manager)">
+            Hire !
+          </div>
+        </div>
+      }
+    }
+
+    <button class="closebutton" mat-raised-button color="primary"
+      (click)="showManagers.set(false)">Close</button>
+  </div>
+}
+
+<!-- ===== UNLOCKS ===== -->
+@if (showUnlocks()) {
+  <div class="modal">
+    <h1 class="title">Want to maximize profits ? Get your investments to these quotas !</h1>
+
+    @for (p of world()?.products; track p.id) {
+      @if (nextPalier(p); as pal) {
+        <div class="row">
+          <img class="round" [attr.src]="gameService.server() + pal.logo" />
+          <div class="rowtext">
+            <div>{{ pal.name }}</div>
+            <div class="cost">{{ pal.seuil }}</div>
+            <div>{{ gameService.libelleBonus(pal) }}</div>
+          </div>
+          <div></div>
+        </div>
+      }
+    }
+
+    <h2>Global unlocks</h2>
+    @for (pal of world()?.allunlocks; track pal.name) {
+      @if (!pal.unlocked) {
+        <div class="row">
+          <img class="round" [attr.src]="gameService.server() + pal.logo" />
+          <div class="rowtext">
+            <div>{{ pal.name }}</div>
+            <div class="cost">{{ pal.seuil }}</div>
+            <div>{{ gameService.libelleBonus(pal) }}</div>
+          </div>
+          <div></div>
+        </div>
+      }
+    }
+
+    <button class="closebutton" mat-raised-button color="primary"
+      (click)="showUnlocks.set(false)">Close</button>
+  </div>
+}
+
+<!-- ===== CASH UPGRADES ===== -->
+@if (showUpgrades()) {
+  <div class="modal">
+    <h1 class="title">Boost your investments !</h1>
+
+    @for (u of world()?.upgrades; track u.name) {
+      @if (!u.unlocked) {
+        <div class="row">
+          <img class="round" [attr.src]="gameService.server() + u.logo" />
+          <div class="rowtext">
+            <div>{{ u.name }}</div>
+            <div class="cost"><span [innerHTML]="u.seuil | bigvalue"></span> $</div>
+            <div>{{ gameService.libelleBonus(u) }}</div>
+          </div>
+          <div
+            class="buybutton"
+            [class.selectable]="(world()?.money ?? 0) >= u.seuil"
+            (click)="gameService.buyCashUpgrade(u)">
+            Buy !
+          </div>
+        </div>
+      }
+    }
+
+    <button class="closebutton" mat-raised-button color="primary"
+      (click)="showUpgrades.set(false)">Close</button>
+  </div>
+}
+
+<!-- ===== ANGEL UPGRADES ===== -->
+@if (showAngelUpgrades()) {
+  <div class="modal">
+    <h1 class="title">Spend your Angels Wisely !</h1>
+
+    @for (u of world()?.angelupgrades; track u.name) {
+      @if (!u.unlocked) {
+        <div class="row">
+          <img class="round" [attr.src]="gameService.server() + u.logo" />
+          <div class="rowtext">
+            <div>{{ u.name }}</div>
+            <div class="cost"><span [innerHTML]="u.seuil | bigvalue"></span> angels</div>
+            <div>{{ gameService.libelleBonus(u) }}</div>
+          </div>
+          <div
+            class="buybutton"
+            [class.selectable]="(world()?.activeangels ?? 0) >= u.seuil"
+            (click)="gameService.buyAngelUpgrade(u)">
+            Buy !
+          </div>
+        </div>
+      }
+    }
+
+    <button class="closebutton" mat-raised-button color="primary"
+      (click)="showAngelUpgrades.set(false)">Close</button>
+  </div>
+}
+
+<!-- ===== INVESTORS ===== -->
+@if (showInvestors()) {
+  <div class="modal">
+    <h1 class="title">Angel Investors</h1>
+
+    <div class="row">
+      <div>
+        <div>{{ world()?.activeangels }} Active Angels</div>
+        <div>{{ world()?.angelbonus }}% Bonus Per Angel</div>
+      </div>
+      <div class="rowtext">
+        <div class="cost">{{ gameService.angesAGagner() }} angels</div>
+        <div>To Claim with Restart</div>
+      </div>
+      <div
+        class="buybutton"
+        [class.selectable]="gameService.angesAGagner() > 0"
+        (click)="gameService.resetWorld(); showInvestors.set(false)">
+        Restart
+      </div>
+    </div>
+
+    <button class="closebutton" mat-raised-button color="primary"
+      (click)="showInvestors.set(false)">Close</button>
+  </div>
+}
 </div>

@@ -34,7 +34,10 @@ export class GameService {
 
   worldQuery = this.apollo.signal.query({
     query: GET_WORLD_QUERY,
-    variables: () => ({ user: this.user() }),
+    // pas de pseudo (première visite) : variables à null, la requête attend
+    variables: () => (this.user() ? { user: this.user() } : null),
+    // toujours redemander au serveur (qui fait foi) en changeant de pseudo
+    fetchPolicy: 'network-only',
   });
 
   // ⚠️ Les données Apollo sont figées : toujours modifier le monde par copie
@@ -44,24 +47,43 @@ export class GameService {
   // Message éphémère affiché par App (snackbar)
   snackmessage = signal('');
 
-  // Formulaire du pseudo
+  // Formulaire du pseudo : le pseudo identifie la partie du joueur côté serveur
   userLoginModel = signal<UserLogin>({ name: '' });
   loginForm = form(this.userLoginModel);
 
+  // Vrai tant que le joueur n'a jamais choisi de pseudo (fenêtre de bienvenue)
+  firstVisit = signal(false);
+
   constructor() {
-    let username = localStorage.getItem('username');
-    if (!username) {
-      username = 'Captain' + Math.floor(Math.random() * 10000);
-      // On mémorise le pseudo généré, sinon un nouveau joueur est créé à chaque rechargement
-      localStorage.setItem('username', username);
+    // on regarde s'il existe un pseudo stocké en local
+    const username = localStorage.getItem('username');
+    if (username) {
+      this.loginForm.name().value.set(username);
+      this.user.set(username);
+    } else {
+      // première visite : App affiche la fenêtre de bienvenue qui demande le pseudo
+      this.firstVisit.set(true);
     }
-    this.loginForm.name().value.set(username);
-    this.user.set(username);
   }
+
+  /** Change de pseudo, et donc de partie (validation par Entrée) */
   commitName() {
-    const field = this.loginForm.name().value();
+    const field = this.loginForm.name().value().trim();
+    if (!field) {
+      // pseudo vide refusé : on remet l'actuel
+      this.loginForm.name().value.set(this.user());
+      return;
+    }
+    this.loginForm.name().value.set(field);
     localStorage.setItem('username', field);
     this.user.set(field);
+  }
+
+  /** Validation du pseudo dans la fenêtre de bienvenue */
+  chooseName() {
+    if (!this.loginForm.name().value().trim()) return;
+    this.commitName();
+    this.firstVisit.set(false);
   }
 
   refreshWorld() {
@@ -81,7 +103,7 @@ export class GameService {
     try {
       await this.acheterProduitsMutation.mutate({ variables: { user: this.user(), id, quantite } });
     } catch {
-      this.snackmessage.set("Erreur serveur : achat du produit");
+      this.snackmessage.set("Server error: product purchase");
     }
   }
 
@@ -89,7 +111,7 @@ export class GameService {
     try {
       await this.lancerProductionMutation.mutate({ variables: { user: this.user(), id } });
     } catch {
-      this.snackmessage.set('Erreur serveur : lancement de production');
+      this.snackmessage.set('Server error: production start');
     }
   }
 
@@ -97,7 +119,7 @@ export class GameService {
     try {
       await this.engagerManagerMutation.mutate({ variables: { user: this.user(), name } });
     } catch {
-      this.snackmessage.set("Erreur serveur : engagement du manager");
+      this.snackmessage.set("Server error: manager hiring");
     }
   }
 
@@ -105,7 +127,7 @@ export class GameService {
     try {
       await this.acheterCashUpgradeMutation.mutate({ variables: { user: this.user(), name } });
     } catch {
-      this.snackmessage.set("Erreur serveur : achat de l'upgrade");
+      this.snackmessage.set('Server error: upgrade purchase');
     }
   }
 
@@ -113,7 +135,7 @@ export class GameService {
     try {
       await this.acheterAngelUpgradeMutation.mutate({ variables: { user: this.user(), name } });
     } catch {
-      this.snackmessage.set("Erreur serveur : achat de l'angel upgrade");
+      this.snackmessage.set('Server error: angel upgrade purchase');
     }
   }
 
@@ -122,7 +144,7 @@ export class GameService {
       await this.resetWorldMutation.mutate({ variables: { user: this.user() } });
       this.refreshWorld();
     } catch {
-      this.snackmessage.set('Erreur serveur : reset du monde');
+      this.snackmessage.set('Server error: world reset');
     }
   }
 
@@ -208,13 +230,13 @@ export class GameService {
 
   /** Texte lisible d'un bonus, ex. "Consultation : vitesse x2" (utile aussi pour les modales de B) */
   libelleBonus(palier: Palier): string {
-    if (palier.typeratio === RatioType.Ange) return `Efficacité des anges +${palier.ratio}%`;
+    if (palier.typeratio === RatioType.Ange) return `Angel effectiveness +${palier.ratio}%`;
     const cible =
       palier.idcible === 0
-        ? 'Tous les services'
+        ? 'All services'
         : (this.world()?.products.find((p) => p.id === palier.idcible)?.name ?? '?');
-    const type = palier.typeratio === RatioType.Gain ? 'gain' : 'vitesse';
-    return `${cible} : ${type} x${palier.ratio}`;
+    const type = palier.typeratio === RatioType.Gain ? 'Profits' : 'Speed';
+    return `${cible} ${type} x${palier.ratio}`;
   }
 
   /** Vérifie et débloque les unlocks du produit + les allunlocks */
@@ -283,7 +305,7 @@ export class GameService {
       };
     });
 
-    this.snackmessage.set(`Manager ${manager.name} engagé !`);
+    this.snackmessage.set(`${manager.name} hired!`);
     this.engagerManagerGraphQL(manager.name);
   }
 
@@ -303,7 +325,7 @@ export class GameService {
     });
 
     this.applyBonus(upgrade);
-    this.snackmessage.set(`Upgrade acheté : ${this.libelleBonus(upgrade)}`);
+    this.snackmessage.set(`Upgrade bought: ${this.libelleBonus(upgrade)}`);
     this.acheterCashUpgradeGraphQL(upgrade.name);
   }
 
@@ -323,7 +345,7 @@ export class GameService {
     });
 
     this.applyBonus(upgrade); // gère gain, vitesse et ange
-    this.snackmessage.set(`Angel upgrade acheté : ${this.libelleBonus(upgrade)}`);
+    this.snackmessage.set(`Angel upgrade bought: ${this.libelleBonus(upgrade)}`);
     this.acheterAngelUpgradeGraphQL(upgrade.name);
   }
 

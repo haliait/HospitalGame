@@ -5,42 +5,64 @@
   </div>
 
   <div class="money">
-    $ <span id="money" [innerHTML]="world()?.money ?? 0 | bigvalue"></span>
+    <span class="coin">$</span> <span id="money" [innerHTML]="world()?.money ?? 0 | bigvalue"></span>
   </div>
 
   <div class="multi">
-    <button mat-raised-button color="accent" (click)="changeQtMulti()">
+    <button class="gamebtn yellow" (click)="changeQtMulti()">
       Buy {{ qtmulti() }}
     </button>
   </div>
 
   <div class="login">
-    <div>Your ID :</div>
+    <div class="label">Your ID</div>
     <input
       type="text"
       [formField]="gameService.loginForm.name"
       (keydown.enter)="gameService.commitName()" />
-    <button mat-stroked-button (click)="gameService.refreshWorld()">Refresh</button>
+    <button class="gamebtn small" (click)="gameService.refreshWorld()">↻ Refresh</button>
   </div>
 </div>
 
+<!-- ===== WELCOME (première visite) ===== -->
+@if (gameService.firstVisit()) {
+  <div class="backdrop"></div>
+  <div class="modal welcome">
+    <h1 class="title">Welcome, Director!</h1>
+    <p>Choose your username. Use the same one later to get back to your game.</p>
+    <input
+      type="text"
+      placeholder="Your username"
+      [formField]="gameService.loginForm.name"
+      (keydown.enter)="gameService.chooseName()" />
+    <button class="gamebtn yellow"
+      [disabled]="!gameService.loginForm.name().value().trim()"
+      (click)="gameService.chooseName()">Start</button>
+  </div>
+}
+
 <div class="main">
   <div class="menu">
-    <button mat-raised-button color="primary" (click)="showUnlocks.set(true)">Unlocks</button>
+    <button class="gamebtn menubtn" (click)="showUnlocks.set(true)">Unlocks</button>
 
-    <button mat-raised-button color="primary"
+    <button class="gamebtn menubtn"
       [matBadge]="badgeUpgrades()" [matBadgeHidden]="badgeUpgrades() == 0"
       (click)="showUpgrades.set(true)">Cash Upgrades</button>
 
-    <button mat-raised-button color="primary"
+    <button class="gamebtn menubtn"
       [matBadge]="badgeAngelUpgrades()" [matBadgeHidden]="badgeAngelUpgrades() == 0"
       (click)="showAngelUpgrades.set(true)">Angel Upgrades</button>
 
-    <button mat-raised-button color="primary"
+    <button class="gamebtn menubtn"
       [matBadge]="badgeManagers()" [matBadgeHidden]="badgeManagers() == 0"
       (click)="showManagers.set(true)">Managers</button>
 
-    <button mat-raised-button color="primary" (click)="showInvestors.set(true)">Investors</button>
+    <button class="gamebtn menubtn" (click)="showInvestors.set(true)">Investors</button>
+
+    <div class="musictoggle" (click)="music.toggle()">
+      <span>Music</span>
+      <span class="switch" [class.on]="music.enabled()"><span class="knob"></span></span>
+    </div>
   </div>
 
   <div class="products">
@@ -52,8 +74,12 @@
 
   <!-- ===== MANAGERS ===== -->
 @if (showManagers()) {
+  <div class="backdrop"></div>
   <div class="modal">
-    <h1 class="title">Managers make you feel better !</h1>
+    <button class="closex" aria-label="Close" (click)="showManagers.set(false)">&times;</button>
+    <h1 class="title">Managers make you feel better!</h1>
+
+    <h2>Available</h2>
 
     @for (manager of world()?.managers; track manager.name) {
       @if (!manager.unlocked) {
@@ -68,21 +94,37 @@
             class="buybutton"
             [class.selectable]="(world()?.money ?? 0) >= manager.seuil"
             (click)="gameService.hireManager(manager)">
-            Hire !
+            Hire!
           </div>
         </div>
       }
     }
 
-    <button class="closebutton" mat-raised-button color="primary"
+    @if (hiredManagers().length > 0) {
+      <h2>My team</h2>
+      @for (manager of hiredManagers(); track manager.name) {
+        <div class="row hired">
+          <img class="round" [attr.src]="gameService.server() + manager.logo" />
+          <div class="rowtext">
+            <div>{{ manager.name }}</div>
+            <div>{{ cibleName(manager) }}</div>
+          </div>
+          <div class="enposte">✓ Hired</div>
+        </div>
+      }
+    }
+
+    <button class="gamebtn closebutton"
       (click)="showManagers.set(false)">Close</button>
   </div>
 }
 
 <!-- ===== UNLOCKS ===== -->
 @if (showUnlocks()) {
+  <div class="backdrop"></div>
   <div class="modal">
-    <h1 class="title">Want to maximize profits ? Get your investments to these quotas !</h1>
+    <button class="closex" aria-label="Close" (click)="showUnlocks.set(false)">&times;</button>
+    <h1 class="title">Want to maximize profits? Get your investments to these quotas!</h1>
 
     @for (p of world()?.products; track p.id) {
       @if (nextPalier(p); as pal) {
@@ -113,15 +155,17 @@
       }
     }
 
-    <button class="closebutton" mat-raised-button color="primary"
+    <button class="gamebtn closebutton"
       (click)="showUnlocks.set(false)">Close</button>
   </div>
 }
 
 <!-- ===== CASH UPGRADES ===== -->
 @if (showUpgrades()) {
+  <div class="backdrop"></div>
   <div class="modal">
-    <h1 class="title">Boost your investments !</h1>
+    <button class="closex" aria-label="Close" (click)="showUpgrades.set(false)">&times;</button>
+    <h1 class="title">Boost your investments!</h1>
 
     @for (u of world()?.upgrades; track u.name) {
       @if (!u.unlocked) {
@@ -136,21 +180,23 @@
             class="buybutton"
             [class.selectable]="(world()?.money ?? 0) >= u.seuil"
             (click)="gameService.buyCashUpgrade(u)">
-            Buy !
+            Buy!
           </div>
         </div>
       }
     }
 
-    <button class="closebutton" mat-raised-button color="primary"
+    <button class="gamebtn closebutton"
       (click)="showUpgrades.set(false)">Close</button>
   </div>
 }
 
 <!-- ===== ANGEL UPGRADES ===== -->
 @if (showAngelUpgrades()) {
+  <div class="backdrop"></div>
   <div class="modal">
-    <h1 class="title">Spend your Angels Wisely !</h1>
+    <button class="closex" aria-label="Close" (click)="showAngelUpgrades.set(false)">&times;</button>
+    <h1 class="title">Spend your Angels wisely!</h1>
 
     @for (u of world()?.angelupgrades; track u.name) {
       @if (!u.unlocked) {
@@ -165,20 +211,22 @@
             class="buybutton"
             [class.selectable]="(world()?.activeangels ?? 0) >= u.seuil"
             (click)="gameService.buyAngelUpgrade(u)">
-            Buy !
+            Buy!
           </div>
         </div>
       }
     }
 
-    <button class="closebutton" mat-raised-button color="primary"
+    <button class="gamebtn closebutton"
       (click)="showAngelUpgrades.set(false)">Close</button>
   </div>
 }
 
 <!-- ===== INVESTORS ===== -->
 @if (showInvestors()) {
+  <div class="backdrop"></div>
   <div class="modal">
+    <button class="closex" aria-label="Close" (click)="showInvestors.set(false)">&times;</button>
     <h1 class="title">Angel Investors</h1>
 
     <div class="row">
@@ -198,7 +246,7 @@
       </div>
     </div>
 
-    <button class="closebutton" mat-raised-button color="primary"
+    <button class="gamebtn closebutton"
       (click)="showInvestors.set(false)">Close</button>
   </div>
 }

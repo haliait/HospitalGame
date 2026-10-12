@@ -5,6 +5,9 @@
     <div class="gauche" (click)="startFabrication()">
       <img class="round" [src]="gameService.server() + p.logo" [alt]="p.name" />
       <div class="quantite">{{ p.quantite }}</div>
+      @if (manager(); as m) {
+        <img class="manager" [src]="gameService.server() + m.logo" [alt]="m.name" [title]="m.name + ' runs this service'" />
+      }
     </div>
 
     <!-- Partie droite -->
@@ -14,14 +17,14 @@
       <!-- Haut : barre de progression + gain d'une production -->
       <div class="progressbar">
         <div class="fill" [style.width.%]="progress()"></div>
-        <span class="gain">{{ p.revenu * p.quantite * gameService.bonusAnges() | number: '1.2-2' }} $</span>
+        <span class="gain"><span [innerHTML]="p.revenu * p.quantite * gameService.bonusAnges() | bigvalue"></span>&nbsp;$</span>
       </div>
 
       <!-- Bas : bouton d'achat + temps restant -->
       <div class="bas">
         <button class="acheter" (click)="acheter()" [disabled]="!canBuy()">
           <span class="multi">Buy x{{ numberToBuy() }}</span>
-          <span class="cout">{{ coutTotal() | number: '1.2-2' }} $</span>
+          <span class="cout"><span [innerHTML]="coutTotal() | bigvalue"></span>&nbsp;$</span>
         </button>
         <div class="temps">{{ timeleft() | seconds }}</div>
       </div>

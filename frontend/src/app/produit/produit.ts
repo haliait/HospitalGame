@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit, computed, inject, input, signal } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
 import { GameService } from '../game-service';
 import { Product } from '../graphql';
 import { SecondsPipe } from '../seconds-pipe';
+import { BigvaluePipe } from '../bigvalue-pipe';
 
 @Component({
   selector: 'app-produit',
-  imports: [DecimalPipe, SecondsPipe],
+  imports: [SecondsPipe, BigvaluePipe],
   templateUrl: './produit.html',
   styleUrl: './produit.css',
 })
@@ -28,8 +28,17 @@ export class Produit implements OnInit, OnDestroy {
     return Math.min(100, Math.max(0, ((p.vitesse - t) / p.vitesse) * 100));
   });
 
+  // Manager engagé pour ce service (affiché en petit sur l'image)
+  manager = computed(() => {
+    const p = this.prod();
+    return this.gameService.world()?.managers.find((m) => m.idcible === p?.id && m.unlocked);
+  });
+
   private lastupdate = performance.now();
   private initialise = false;
+  // Joueur et vitesse connus au dernier calcul (pour détecter un changement de partie ou un bonus)
+  private userConnu = '';
+  private vitesseConnue = 0;
   private timer?: ReturnType<typeof setInterval>;
 
   ngOnInit() {
@@ -61,14 +70,23 @@ export class Produit implements OnInit, OnDestroy {
     const p = this.prod();
     if (!p) return;
 
-    // Premier passage : on reprend le temps restant connu du serveur
-    if (!this.initialise) {
+    // Premier passage (ou changement de pseudo) : on reprend le temps restant connu du serveur
+    if (!this.initialise || this.userConnu !== this.gameService.user()) {
       this.timeleft.set(p.timeleft);
       this.initialise = true;
+      this.userConnu = this.gameService.user();
+      this.vitesseConnue = p.vitesse;
       return;
     }
 
     let t = this.timeleft();
+
+    // Bonus de vitesse pendant une production : le temps restant diminue dans la même
+    // proportion, la barre accélère au lieu de repartir de zéro
+    if (p.vitesse !== this.vitesseConnue) {
+      if (t > 0) t = (t * p.vitesse) / this.vitesseConnue;
+      this.vitesseConnue = p.vitesse;
+    }
 
     if (!p.managerUnlocked) {
       // CAS 1 : pas de manager, une seule production par clic

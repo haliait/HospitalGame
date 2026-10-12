@@ -1,7 +1,7 @@
 import { RatioType } from './graphql.js';
 
 export const origworld = {
-  name: 'Clinique Saint-Espoir',
+  name: 'St. Hope Hospital',
   logo: 'icones/hopital.jpg',
   money: 0,
   score: 0,
@@ -14,16 +14,16 @@ export const origworld = {
       id: 1,
       name: 'Consultation',
       logo: 'icones/consultation.jpg',
-      cout: 4,
+      cout: 80,
       croissance: 1.07,
-      revenu: 1,
+      revenu: 20,
       vitesse: 1000,
       quantite: 1,
       timeleft: 0,
       managerUnlocked: false,
       paliers: [
         {
-          name: "Salle d'attente agrandie",
+          name: 'Bigger Waiting Room',
           logo: 'icones/consultation.jpg',
           seuil: 20,
           idcible: 1,
@@ -32,7 +32,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Assistant médical',
+          name: 'Medical Assistant',
           logo: 'icones/consultation.jpg',
           seuil: 50,
           idcible: 1,
@@ -41,7 +41,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Certification qualité',
+          name: 'Quality Certification',
           logo: 'icones/consultation.jpg',
           seuil: 150,
           idcible: 1,
@@ -53,18 +53,18 @@ export const origworld = {
     },
     {
       id: 2,
-      name: 'Radiologie',
+      name: 'Radiology',
       logo: 'icones/radiologie.jpg',
-      cout: 60,
+      cout: 180,
       croissance: 1.15,
-      revenu: 60,
+      revenu: 180,
       vitesse: 3000,
       quantite: 0,
       timeleft: 0,
       managerUnlocked: false,
       paliers: [
         {
-          name: 'Nouvelle salle de radio',
+          name: 'New X-Ray Room',
           logo: 'icones/radiologie.jpg',
           seuil: 20,
           idcible: 2,
@@ -73,7 +73,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Technicien qualifié',
+          name: 'Skilled Technician',
           logo: 'icones/radiologie.jpg',
           seuil: 50,
           idcible: 2,
@@ -82,7 +82,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Service accrédité',
+          name: 'Accredited Department',
           logo: 'icones/radiologie.jpg',
           seuil: 150,
           idcible: 2,
@@ -94,18 +94,18 @@ export const origworld = {
     },
     {
       id: 3,
-      name: 'Bloc opératoire',
+      name: 'Operating Room',
       logo: 'icones/bloc.jpg',
-      cout: 720,
+      cout: 1440,
       croissance: 1.14,
-      revenu: 540,
+      revenu: 1080,
       vitesse: 6000,
       quantite: 0,
       timeleft: 0,
       managerUnlocked: false,
       paliers: [
         {
-          name: 'Salle stérile supplémentaire',
+          name: 'Extra Sterile Room',
           logo: 'icones/bloc.jpg',
           seuil: 20,
           idcible: 3,
@@ -114,7 +114,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Chirurgien senior',
+          name: 'Senior Surgeon',
           logo: 'icones/bloc.jpg',
           seuil: 50,
           idcible: 3,
@@ -123,7 +123,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Réputation chirurgicale',
+          name: 'Surgical Reputation',
           logo: 'icones/bloc.jpg',
           seuil: 150,
           idcible: 3,
@@ -135,18 +135,18 @@ export const origworld = {
     },
     {
       id: 4,
-      name: 'Laboratoire',
+      name: 'Laboratory',
       logo: 'icones/labo.jpg',
-      cout: 8640,
+      cout: 12960,
       croissance: 1.13,
-      revenu: 4320,
+      revenu: 6480,
       vitesse: 12000,
       quantite: 0,
       timeleft: 0,
       managerUnlocked: false,
       paliers: [
         {
-          name: 'Nouveaux analyseurs',
+          name: 'New Analyzers',
           logo: 'icones/labo.jpg',
           seuil: 20,
           idcible: 4,
@@ -155,7 +155,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Biologiste expert',
+          name: 'Expert Biologist',
           logo: 'icones/labo.jpg',
           seuil: 50,
           idcible: 4,
@@ -164,7 +164,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Laboratoire de référence',
+          name: 'Reference Laboratory',
           logo: 'icones/labo.jpg',
           seuil: 150,
           idcible: 4,
@@ -176,18 +176,18 @@ export const origworld = {
     },
     {
       id: 5,
-      name: 'Soins intensifs',
+      name: 'Intensive Care',
       logo: 'icones/reanimation.jpg',
-      cout: 103680,
+      cout: 124416,
       croissance: 1.12,
-      revenu: 51840,
+      revenu: 62208,
       vitesse: 24000,
       quantite: 0,
       timeleft: 0,
       managerUnlocked: false,
       paliers: [
         {
-          name: 'Lits de réanimation supplémentaires',
+          name: 'Extra ICU Beds',
           logo: 'icones/reanimation.jpg',
           seuil: 20,
           idcible: 5,
@@ -196,7 +196,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Équipe de nuit renforcée',
+          name: 'Stronger Night Shift',
           logo: 'icones/reanimation.jpg',
           seuil: 50,
           idcible: 5,
@@ -205,7 +205,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Unité de pointe',
+          name: 'State-of-the-Art Unit',
           logo: 'icones/reanimation.jpg',
           seuil: 150,
           idcible: 5,
@@ -217,7 +217,7 @@ export const origworld = {
     },
     {
       id: 6,
-      name: 'Imagerie IRM',
+      name: 'MRI Imaging',
       logo: 'icones/irm.jpg',
       cout: 1244160,
       croissance: 1.11,
@@ -228,7 +228,7 @@ export const origworld = {
       managerUnlocked: false,
       paliers: [
         {
-          name: 'Deuxième appareil IRM',
+          name: 'Second MRI Scanner',
           logo: 'icones/irm.jpg',
           seuil: 20,
           idcible: 6,
@@ -237,7 +237,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Radiologue spécialisé',
+          name: 'Specialist Radiologist',
           logo: 'icones/irm.jpg',
           seuil: 50,
           idcible: 6,
@@ -246,7 +246,7 @@ export const origworld = {
           unlocked: false,
         },
         {
-          name: 'Centre de référence régional',
+          name: 'Regional Reference Center',
           logo: 'icones/irm.jpg',
           seuil: 150,
           idcible: 6,
@@ -259,7 +259,7 @@ export const origworld = {
   ],
   allunlocks: [
     {
-      name: 'Accréditation régionale',
+      name: 'Regional Accreditation',
       logo: 'icones/all.jpg',
       seuil: 25,
       idcible: 0,
@@ -268,7 +268,7 @@ export const origworld = {
       unlocked: false,
     },
     {
-      name: 'Label national de santé',
+      name: 'National Health Label',
       logo: 'icones/all.jpg',
       seuil: 100,
       idcible: 0,
@@ -277,7 +277,7 @@ export const origworld = {
       unlocked: false,
     },
     {
-      name: "Prix d'excellence hospitalière",
+      name: 'Hospital Excellence Award',
       logo: 'icones/all.jpg',
       seuil: 250,
       idcible: 0,
@@ -288,52 +288,52 @@ export const origworld = {
   ],
   upgrades: [
     {
-      name: 'Nouveau matériel de consultation',
+      name: 'New Consultation Equipment',
       logo: 'icones/consultation.jpg',
-      seuil: 1000,
+      seuil: 20000,
       idcible: 1,
       ratio: 3,
       typeratio: RatioType.gain,
       unlocked: false,
     },
     {
-      name: 'Scanner dernière génération',
+      name: 'Latest CT Scanner',
       logo: 'icones/radiologie.jpg',
-      seuil: 15000,
+      seuil: 45000,
       idcible: 2,
       ratio: 3,
       typeratio: RatioType.gain,
       unlocked: false,
     },
     {
-      name: 'Robot chirurgical',
+      name: 'Surgical Robot',
       logo: 'icones/bloc.jpg',
-      seuil: 100000,
+      seuil: 200000,
       idcible: 3,
       ratio: 3,
       typeratio: RatioType.gain,
       unlocked: false,
     },
     {
-      name: 'Automate de laboratoire',
+      name: 'Lab Automation',
       logo: 'icones/labo.jpg',
-      seuil: 500000,
+      seuil: 750000,
       idcible: 4,
       ratio: 3,
       typeratio: RatioType.gain,
       unlocked: false,
     },
     {
-      name: 'Lits connectés',
+      name: 'Smart Beds',
       logo: 'icones/reanimation.jpg',
-      seuil: 1200000,
+      seuil: 1440000,
       idcible: 5,
       ratio: 3,
       typeratio: RatioType.gain,
       unlocked: false,
     },
     {
-      name: 'IRM 3 Tesla',
+      name: '3 Tesla MRI',
       logo: 'icones/irm.jpg',
       seuil: 10000000,
       idcible: 6,
@@ -342,7 +342,7 @@ export const origworld = {
       unlocked: false,
     },
     {
-      name: 'Formation continue du personnel',
+      name: 'Staff Training',
       logo: 'icones/all.jpg',
       seuil: 50000,
       idcible: 0,
@@ -351,7 +351,7 @@ export const origworld = {
       unlocked: false,
     },
     {
-      name: 'Logiciel de gestion des flux',
+      name: 'Patient Flow Software',
       logo: 'icones/all.jpg',
       seuil: 2000000,
       idcible: 0,
@@ -360,7 +360,7 @@ export const origworld = {
       unlocked: false,
     },
     {
-      name: 'Partenariat pharmaceutique',
+      name: 'Pharma Partnership',
       logo: 'icones/all.jpg',
       seuil: 20000000,
       idcible: 0,
@@ -369,7 +369,7 @@ export const origworld = {
       unlocked: false,
     },
     {
-      name: 'Fondation caritative',
+      name: 'Charity Foundation',
       logo: 'icones/all.jpg',
       seuil: 100000000,
       idcible: 0,
@@ -380,7 +380,7 @@ export const origworld = {
   ],
   angelupgrades: [
     {
-      name: 'Don fondateur',
+      name: 'Founding Donation',
       logo: 'icones/mecene.jpg',
       seuil: 10,
       idcible: 0,
@@ -389,7 +389,7 @@ export const origworld = {
       unlocked: false,
     },
     {
-      name: 'Réseau de mécènes',
+      name: 'Donor Network',
       logo: 'icones/mecene.jpg',
       seuil: 100000,
       idcible: -1,
@@ -398,7 +398,7 @@ export const origworld = {
       unlocked: false,
     },
     {
-      name: 'Fondation internationale',
+      name: 'International Foundation',
       logo: 'icones/mecene.jpg',
       seuil: 100000000,
       idcible: -1,
@@ -407,7 +407,7 @@ export const origworld = {
       unlocked: false,
     },
     {
-      name: 'Legs philanthropique',
+      name: 'Philanthropic Legacy',
       logo: 'icones/mecene.jpg',
       seuil: 1000000000,
       idcible: 0,
@@ -420,7 +420,7 @@ export const origworld = {
     {
       name: 'Dr. Martin',
       logo: 'icones/dr_martin.jpg',
-      seuil: 1000,
+      seuil: 20000,
       idcible: 1,
       ratio: 0,
       typeratio: RatioType.gain,
@@ -429,7 +429,7 @@ export const origworld = {
     {
       name: 'Dr. Dubois',
       logo: 'icones/dr_dubois.jpg',
-      seuil: 15000,
+      seuil: 45000,
       idcible: 2,
       ratio: 0,
       typeratio: RatioType.gain,
@@ -438,7 +438,7 @@ export const origworld = {
     {
       name: 'Dr. Nguyen',
       logo: 'icones/dr_nguyen.jpg',
-      seuil: 100000,
+      seuil: 200000,
       idcible: 3,
       ratio: 0,
       typeratio: RatioType.gain,
@@ -447,7 +447,7 @@ export const origworld = {
     {
       name: 'Dr. Haddad',
       logo: 'icones/dr_haddad.jpg',
-      seuil: 500000,
+      seuil: 750000,
       idcible: 4,
       ratio: 0,
       typeratio: RatioType.gain,
@@ -456,7 +456,7 @@ export const origworld = {
     {
       name: 'Dr. Okafor',
       logo: 'icones/dr_okafor.jpg',
-      seuil: 1200000,
+      seuil: 1440000,
       idcible: 5,
       ratio: 0,
       typeratio: RatioType.gain,

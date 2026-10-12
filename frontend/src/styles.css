@@ -1,1 +1,42 @@
-/* You can add global styles to this file, and also import other style files */
+/* ===== Thème global « Hôpital cartoon » ===== */
+:root {
+  --teal: #12b5a6;
+  --teal-dark: #0b8378;
+  --blue: #2e86de;
+  --blue-dark: #1b5fa8;
+  --red: #ee4f4f;
+  --red-dark: #b83232;
+  --yellow: #ffc93c;
+  --yellow-dark: #d99a00;
+  --ink: #23395b;
+  --card: #ffffff;
+  --bg: #e7f6f3;
+  --font-title: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-body) !important;
+  color: var(--ink) !important;
+  min-height: 100%;
+  /* petites croix médicales en motif de fond */
+  background-color: var(--bg) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M26 18h8v8h8v8h-8v8h-8v-8h-8v-8h8z' fill='%2312b5a6' fill-opacity='0.08'/%3E%3C/svg%3E");
+}
+
+h1, h2, h3 { font-family: var(--font-title); }
+
+/* Pastilles de badge (Angular Material) plus « jeu » */
+.mat-badge-content {
+  background: var(--red) !important;
+  color: white !important;
+  font-family: var(--font-title) !important;
+  font-weight: 700 !important;
+  border: 2px solid white;
+  animation: badge-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}

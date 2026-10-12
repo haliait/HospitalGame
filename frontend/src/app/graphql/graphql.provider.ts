@@ -11,7 +11,11 @@ export function provideGraphQL(): EnvironmentProviders {
         // Backend de test du prof : https://isiscapitalist.chl.connected-health.fr/graphql
         const httpLink = httpLinkFactory.create({ uri: 'http://localhost:3000/graphql' });
         return {
-          cache: new InMemoryCache(),
+          cache: new InMemoryCache({
+            // Les produits ont les mêmes id (1 à 6) pour tous les joueurs : sans cela, Apollo
+            // les fusionne dans son cache et la partie d'un pseudo écrase celle d'un autre
+            typePolicies: { Product: { keyFields: false } },
+          }),
           link: httpLink,
         };
       }),

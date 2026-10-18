@@ -39,8 +39,11 @@ export class AppService {
   }
 
   updateWorld(world: World) {
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    const elapsed = (nowSeconds - world.lastupdate) * 1000;
+    // lastupdate en millisecondes (String, comme dans l'énoncé) : précision au ms près
+    const now = Date.now();
+    let last = Number(world.lastupdate);
+    if (last > 0 && last < 1e12) last *= 1000; // anciennes sauvegardes stockées en secondes
+    const elapsed = now - last;
 
     const bonusAnges = 1 + (world.activeangels * world.angelbonus) / 100;
 
@@ -86,7 +89,7 @@ export class AppService {
       }
     }
 
-    world.lastupdate = nowSeconds;
+    world.lastupdate = String(now);
     return world;
   }
 
@@ -103,11 +106,15 @@ export class AppService {
     } else if (palier.typeratio === RatioType.vitesse) {
       if (palier.idcible === 0) {
         for (const p of world.products) {
-          p.vitesse /= palier.ratio;
+          p.vitesse = Math.round(p.vitesse / palier.ratio); // vitesse est un Int
+          p.timeleft = Math.round(p.timeleft / palier.ratio); // production en cours accélérée (comme le front)
         }
       } else {
         const product = world.products.find((p) => p.id === palier.idcible);
-        if (product) product.vitesse /= palier.ratio;
+        if (product) {
+          product.vitesse = Math.round(product.vitesse / palier.ratio);
+          product.timeleft = Math.round(product.timeleft / palier.ratio);
+        }
       }
     } else if (palier.typeratio === RatioType.ange) {
       world.angelbonus += palier.ratio;

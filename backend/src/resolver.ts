@@ -166,6 +166,7 @@ export class GraphQlResolver {
         nouveauMonde.score = world.score;
         nouveauMonde.totalangels = world.totalangels + Math.max(0, angesGagnes);
         nouveauMonde.activeangels = world.activeangels + Math.max(0, angesGagnes);
+        nouveauMonde.lastupdate = String(Date.now());
 
         this.service.saveWorld(user, nouveauMonde);
         return nouveauMonde;

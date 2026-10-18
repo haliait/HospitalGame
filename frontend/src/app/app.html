@@ -20,7 +20,12 @@
       type="text"
       [formField]="gameService.loginForm.name"
       (keydown.enter)="gameService.commitName()" />
-    <button class="gamebtn small" (click)="gameService.refreshWorld()">↻ Refresh</button>
+    <button class="gamebtn small" (click)="gameService.commitName(); gameService.refreshWorld()">↻ Refresh</button>
+    <div class="label">Server</div>
+    <input
+      type="text"
+      [value]="gameService.server()"
+      (keydown.enter)="gameService.changeServer($any($event.target).value)" />
   </div>
 </div>
 
@@ -100,19 +105,6 @@
       }
     }
 
-    @if (hiredManagers().length > 0) {
-      <h2>My team</h2>
-      @for (manager of hiredManagers(); track manager.name) {
-        <div class="row hired">
-          <img class="round" [attr.src]="gameService.server() + manager.logo" />
-          <div class="rowtext">
-            <div>{{ manager.name }}</div>
-            <div>{{ cibleName(manager) }}</div>
-          </div>
-          <div class="enposte">✓ Hired</div>
-        </div>
-      }
-    }
 
     <button class="gamebtn closebutton"
       (click)="showManagers.set(false)">Close</button>
@@ -231,6 +223,7 @@
 
     <div class="row">
       <div>
+        <div>{{ world()?.totalangels }} Total Angels</div>
         <div>{{ world()?.activeangels }} Active Angels</div>
         <div>{{ world()?.angelbonus }}% Bonus Per Angel</div>
       </div>

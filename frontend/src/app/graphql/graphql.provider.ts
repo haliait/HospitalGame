@@ -9,7 +9,10 @@ export function provideGraphQL(): EnvironmentProviders {
         const httpLinkFactory = inject(HttpLinkFactory);
         // ⚠️ Port 3000 (notre backend NestJS), et non 4000 comme dans l'apéritif
         // Backend de test du prof : https://isiscapitalist.chl.connected-health.fr/graphql
-        const httpLink = httpLinkFactory.create({ uri: 'http://localhost:3000/graphql' });
+        // Adresse relue à chaque requête : le joueur peut la changer (GameService.changeServer)
+        const httpLink = httpLinkFactory.create({
+          uri: () => (localStorage.getItem('server') ?? 'http://localhost:3000/') + 'graphql',
+        });
         return {
           cache: new InMemoryCache({
             // Les produits ont les mêmes id (1 à 6) pour tous les joueurs : sans cela, Apollo

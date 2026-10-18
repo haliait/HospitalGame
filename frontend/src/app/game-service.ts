@@ -30,7 +30,8 @@ export class GameService {
 
   user = signal('');
   // ⚠️ slash final obligatoire : les logos sont de la forme "icones/xxx.png"
-  server = signal('http://localhost:3000/');
+  // Adresse du backend, modifiable par le joueur et mémorisée (lue aussi par graphql.provider.ts)
+  server = signal(localStorage.getItem('server') ?? 'http://localhost:3000/');
 
   worldQuery = this.apollo.signal.query({
     query: GET_WORLD_QUERY,
@@ -45,7 +46,8 @@ export class GameService {
   world = linkedSignal(() => this.worldQuery.data()?.getWorld);
 
   // Message éphémère affiché par App (snackbar)
-  snackmessage = signal('');
+  // equal: () => false → le même message deux fois de suite s'affiche aussi deux fois
+  snackmessage = signal('', { equal: () => false });
 
   // Formulaire du pseudo : le pseudo identifie la partie du joueur côté serveur
   userLoginModel = signal<UserLogin>({ name: '' });
@@ -88,6 +90,17 @@ export class GameService {
 
   refreshWorld() {
     this.worldQuery.refetch();
+  }
+
+  /** Change l'adresse du backend (validation par Entrée) puis recharge le monde */
+  changeServer(url: string) {
+    let adresse = url.trim();
+    if (!adresse) return;
+    if (!adresse.endsWith('/')) adresse += '/'; // les logos sont de la forme "icones/xxx.jpg"
+    localStorage.setItem('server', adresse);
+    this.server.set(adresse);
+    this.refreshWorld();
+    this.snackmessage.set(`Server: ${adresse}`);
   }
 
   // ---------- Mutations GraphQL (appels backend) ----------
@@ -141,8 +154,10 @@ export class GameService {
 
   async resetWorldGraphQL() {
     try {
+      const anges = this.angesAGagner();
       await this.resetWorldMutation.mutate({ variables: { user: this.user() } });
       this.refreshWorld();
+      this.snackmessage.set(`World reset: +${anges} angels`);
     } catch {
       this.snackmessage.set('Server error: world reset');
     }
@@ -197,7 +212,8 @@ export class GameService {
     // Nouveau monde : produits mis à jour + argent diminué
     this.world.set({ ...w, products, money: w.money - cost });
 
-    this.checkUnlocks(); // débloque les bonus si un seuil est atteint
+    this.snackmessage.set(`${qt} × ${product.name} bought`);
+    this.checkUnlocks(); // débloque les bonus si un seuil est atteint (message remplacé)
     this.acheterProduitsGraphQL(product.id, qt); // prévenir le backend
   }
 
@@ -220,7 +236,8 @@ export class GameService {
     if (palier.typeratio === RatioType.Gain) {
       cibles.forEach((p) => (p.revenu *= palier.ratio));
     } else if (palier.typeratio === RatioType.Vitesse) {
-      cibles.forEach((p) => (p.vitesse /= palier.ratio));
+      // arrondi : vitesse est un Int dans le schéma GraphQL (même calcul que le backend)
+      cibles.forEach((p) => (p.vitesse = Math.round(p.vitesse / palier.ratio)));
     } else if (palier.typeratio === RatioType.Ange) {
       nw.angelbonus += palier.ratio;
     }

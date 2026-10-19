@@ -1,7 +1,13 @@
 <div class="header">
-  <div class="world">
-    <img class="round" [src]="gameService.server() + world()?.logo" />
-    <span>{{ world()?.name }}</span>
+  <!-- Logo : emblème du monde + nom mis en forme (reste lié au monde chargé) -->
+  <div class="world" [title]="world()?.name">
+    <span class="emblem">
+      <img class="round" [src]="gameService.server() + world()?.logo" />
+    </span>
+    <div class="wordmark">
+      <span class="wm-top">{{ logoHaut() }}</span>
+      <span class="wm-ribbon">{{ logoBas() }}</span>
+    </div>
   </div>
 
   <div class="money">
@@ -14,15 +20,22 @@
     </button>
   </div>
 
+  <div class="musictoggle" (click)="music.toggle()" title="Music">
+    <span class="note">♪</span>
+    <span class="switch" [class.on]="music.enabled()"><span class="knob"></span></span>
+  </div>
+
+  <!-- 2 lignes : pseudo + refresh / adresse du serveur -->
   <div class="login">
-    <div class="label">Your ID</div>
+    <span class="label">ID</span>
     <input
       type="text"
       [formField]="gameService.loginForm.name"
       (keydown.enter)="gameService.commitName()" />
-    <button class="gamebtn small" (click)="gameService.commitName(); gameService.refreshWorld()">↻ Refresh</button>
-    <div class="label">Server</div>
+    <button class="gamebtn small" title="Refresh" (click)="gameService.commitName(); gameService.refreshWorld()">↻</button>
+    <span class="label">Server</span>
     <input
+      class="server"
       type="text"
       [value]="gameService.server()"
       (keydown.enter)="gameService.changeServer($any($event.target).value)" />
@@ -64,10 +77,7 @@
 
     <button class="gamebtn menubtn" (click)="showInvestors.set(true)">Investors</button>
 
-    <div class="musictoggle" (click)="music.toggle()">
-      <span>Music</span>
-      <span class="switch" [class.on]="music.enabled()"><span class="knob"></span></span>
-    </div>
+    <img class="mascotte" src="infirmiere.png" alt="" />
   </div>
 
   <div class="products">

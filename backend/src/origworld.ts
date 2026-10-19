@@ -420,7 +420,7 @@ export const origworld = {
     {
       name: 'Dr. Martin',
       logo: 'icones/dr_martin.jpg',
-      seuil: 20000,
+      seuil: 2500,
       idcible: 1,
       ratio: 0,
       typeratio: RatioType.gain,

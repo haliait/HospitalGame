@@ -36,6 +36,11 @@ export class App {
   showAngelUpgrades = signal(false);
   showInvestors = signal(false);
 
+  // ---- Logo : le nom du monde coupé en deux (ex. « St. Hope » / « Hospital ») ----
+  private motsDuNom = computed(() => (this.world()?.name ?? '').trim().split(/\s+/));
+  logoHaut = computed(() => this.motsDuNom().slice(0, -1).join(' '));
+  logoBas = computed(() => this.motsDuNom().at(-1) ?? '');
+
   // ---- Badges ----
   badgeManagers = computed(() => {
     const w = this.world();
